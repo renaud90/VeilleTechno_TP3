@@ -3,25 +3,40 @@
 namespace TP3VeilleSignalR.Hubs;
 
 public record ChatMessage(string UserId, string ConversationId, string Message, DateTime Timestamp);
-public record ChatJoinOrLeave(string UserId, string ConversationId);
+public record GroupJoinOrLeave(string UserId, string GroupId);
 
 public class ChatHub : Hub
 {
-    public async Task Join(ChatJoinOrLeave payload)
+    public async Task Connect(string user)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, payload.ConversationId);
-        await Clients.Group(payload.ConversationId).SendAsync("UserJoined", new { payload.UserId });
+        await Clients.Caller.SendAsync("ConnectionResult", new { IsSuccess = true });
     }
 
-    public async Task Leave(ChatJoinOrLeave payload)
+    public async Task GetAllUsers()
     {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, payload.ConversationId);
-        await Clients.Group(payload.ConversationId).SendAsync("UserLeft", new { payload.UserId });
+        await Clients.Caller.SendAsync("UserData", new[] { new { userId = "Bobby", isConnected = true } });
     }
-    
+
+    public async Task JoinGroup(GroupJoinOrLeave payload)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, payload.GroupId);
+        await Clients.Group(payload.GroupId).SendAsync("UserJoined", new { payload.UserId });
+    }
+
+    public async Task LeaveGroup(GroupJoinOrLeave payload)
+    {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, payload.GroupId);
+        await Clients.Group(payload.GroupId).SendAsync("UserLeft", new { payload.UserId });
+    }
+
     public async Task SendMessage(ChatMessage message)
     {
         await Clients.Group(message.ConversationId).SendAsync("ReceiveMessage", message);
+    }
+
+    public async Task Disconnect(string userId)
+    {
+
     }
 }
 
