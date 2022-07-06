@@ -1,6 +1,9 @@
+using TP3VeilleSignalR.Data;
 using TP3VeilleSignalR.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<ChatDbSettings>(builder.Configuration.GetSection("ChatDbSettings"));
 
 builder.Services.AddSignalR();
 
