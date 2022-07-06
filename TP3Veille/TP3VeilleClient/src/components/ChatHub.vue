@@ -15,11 +15,11 @@
 <script lang="ts">
 import { useSignalR, HubCommandToken } from "@quangdao/vue-signalr";
 
-interface MyObject {
-  prop: string;
+interface ConnectionPayload {
+  isSuccess: boolean;
 }
 
-const Connect: HubCommandToken<MyObject> = "Connect";
+const Connect: HubCommandToken<string, ConnectionPayload> = "Connect";
 
 export default {
   name: "ChatHub",
@@ -28,7 +28,11 @@ export default {
   },
   setup() {
     const signalr = useSignalR();
-    signalr.invoke(Connect).then(() => console.log("Je suis connecté!"));
+    signalr
+      .invoke(Connect, "test1234")
+      .then(({ isSuccess }) =>
+        console.log(`Résultat: ${isSuccess} Je suis connecté!`)
+      );
   },
   created() {
     console.log("ALLO");
