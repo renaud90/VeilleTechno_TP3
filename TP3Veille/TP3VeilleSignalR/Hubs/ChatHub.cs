@@ -5,16 +5,18 @@ namespace TP3VeilleSignalR.Hubs;
 public record ChatMessage(string UserId, string ConversationId, string Message, DateTime Timestamp);
 public record GroupJoinOrLeave(string UserId, string GroupId);
 
+public record ConnectionResult(bool IsSuccess);
+
 public class ChatHub : Hub
 {
-    public async Task Connect(string user)
+    public async Task<ConnectionResult> Connect(string user)
     {
-        await Clients.Caller.SendAsync("ConnectionResult", new { IsSuccess = true });
+        return new ConnectionResult(true);
     }
 
-    public async Task GetAllUsers()
+    public async Task<IEnumerable<object>> GetAllUsers()
     {
-        await Clients.Caller.SendAsync("UserData", new[] { new { userId = "Bobby", isConnected = true } });
+       return new[] { new { userId = "Bobby", isConnected = true } };
     }
 
     public async Task JoinGroup(GroupJoinOrLeave payload)

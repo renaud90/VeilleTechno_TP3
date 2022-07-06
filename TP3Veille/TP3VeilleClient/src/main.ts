@@ -6,7 +6,7 @@ import { VueSignalR } from "@quangdao/vue-signalr";
 
 createApp(App)
   .use(VueSignalR, {
-    url: "https://localhost:7242" /*'http://localhost:5062'*/,
+    url: "https://localhost:7242/chat" /*'http://localhost:5062'*/,
   })
   .use(store)
   .use(router)
