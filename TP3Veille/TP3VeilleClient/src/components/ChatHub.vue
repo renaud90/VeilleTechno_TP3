@@ -1,7 +1,11 @@
 <template>
   <div class="body">
-    <div class="entete">LOGO</div>
-    <div class="conversation">CONVERSATION</div>
+    <div class="entete">
+      <slot name="entete"></slot>
+    </div>
+    <div class="conversation">
+      <slot name="conversation"></slot>
+    </div>
     <div class="profil">PROFIL</div>
     <div class="personnes">PERSONNES CONNECTÉES</div>
     <div class="groupes">GROUPES</div>
@@ -32,8 +36,12 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
+<style lang="scss">
+html,
+body,
+.body {
+  min-height: 85vh;
+}
 h3 {
   margin: 40px 0 0;
 }
@@ -48,24 +56,31 @@ li {
 a {
   color: #42b983;
 }
+.container {
+  display: flex;
+  height: 100%;
+}
+.column-reverse {
+  flex-direction: column-reverse;
+}
 .body {
   display: grid;
-  gap: 15px;
-  min-height: 1000px;
+  grid-template-rows: 12% 12% 12% 12% 12% 12% 12% 12%;
+  gap: 20px;
 }
 .entete {
   grid-column-start: 1;
   grid-column-end: 4;
   grid-row-start: 1;
   grid-row-end: 2;
-  border: 2px solid brown;
 }
 .conversation {
   grid-column-start: 1;
   grid-column-end: 4;
   grid-row-start: 2;
   grid-row-end: 9;
-  border: 2px solid green;
+  border: 2px solid lightgray;
+  border-radius: 5px;
 }
 .profil {
   grid-column-start: 4;
