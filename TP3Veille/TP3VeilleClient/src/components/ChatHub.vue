@@ -44,7 +44,8 @@ export default {
 html,
 body,
 .body {
-  min-height: 85vh;
+  height: 85vh;
+  font-size: 16px;
 }
 h3 {
   margin: 40px 0 0;
@@ -63,6 +64,7 @@ a {
 .container {
   display: flex;
   height: 100%;
+  overflow: hidden;
 }
 .column-reverse {
   flex-direction: column-reverse;
