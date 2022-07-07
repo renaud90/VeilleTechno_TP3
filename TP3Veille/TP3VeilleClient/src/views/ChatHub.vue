@@ -5,7 +5,7 @@
         <EnteteComponent />
       </template>
       <template v-slot:conversation>
-        <ConversationComponent />
+        <ConversationComponent userId="test1234" conversationId="test1234" />
       </template>
     </ChatHub>
   </div>
