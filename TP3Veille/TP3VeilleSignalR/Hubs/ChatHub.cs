@@ -12,12 +12,12 @@ public record ConnectionResult(bool IsSuccess);
 
 public class ChatHub : Hub
 {
-    private readonly IUsersService _usersService;
+    //private readonly IUsersService _usersService;
 
-    public ChatHub(IUsersService usersService)
-    {
-        _usersService = usersService;
-    }
+    //public ChatHub(IUsersService usersService)
+    //{
+    //    _usersService = usersService;
+    //}
     
     public async Task<ConnectionResult> Connect(string userId)
     {
