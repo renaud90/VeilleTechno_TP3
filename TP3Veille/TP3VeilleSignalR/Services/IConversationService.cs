@@ -5,9 +5,9 @@ namespace TP3VeilleSignalR.Services;
 
 public interface IConversationService
 {
-    public Task<bool> ConversationExists(string conversationId);
-    public Task<bool> AddUserToConversation(string conversationId, string username);
-    public Task<bool> RemoveUserFromConversation(string conversationId, string username);
-    public Task<Conversation> GetConversationById(string conversationId);
+    public Task<bool> ExistsAsync(string conversationId);
+    public Task<bool> AddUserToConversationAsync(string conversationId, string username);
+    public Task<bool> RemoveUserFromConversationAsync(string conversationId, string username);
+    public Task<Conversation> GetByIdAsync(string conversationId);
     public Task<bool> AddMessageToConversation(string conversationId, ChatMessage message);
 }
