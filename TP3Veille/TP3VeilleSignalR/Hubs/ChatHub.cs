@@ -5,7 +5,7 @@ using TP3VeilleSignalR.Utilities;
 
 namespace TP3VeilleSignalR.Hubs;
 
-public record ChatMessage(string UserId, string ConversationId, string Message, DateTime Moment);
+public record ChatMessage(string UserId, string ConversationId, string Content, DateTime Moment);
 public record ChatUser(string UserId, IEnumerable<string> Friends, DateTime? LastTimeConnected);
 public record ConversationInfo(string UserId, string ConversationId);
 public record ConnectionResult(bool IsSuccess);

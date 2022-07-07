@@ -45,7 +45,7 @@ html,
 body,
 .body {
   height: 85vh;
-  font-size: 16px;
+  font-size: 20px;
 }
 h3 {
   margin: 40px 0 0;

@@ -15,6 +15,7 @@
       :key="index"
     >
       <img
+        class="user-image"
         v-if="m.class === 'message-received'"
         :src="m.image ?? require('@/assets/person-icon.png')"
         alt=""
@@ -127,6 +128,12 @@ export default defineComponent({
   background-color: lightgray;
   align-self: flex-start;
   margin-left: 15px;
+}
+.user-image {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  padding-right: 5px;
 }
 #div-conv-input {
   width: 100%-20px;
