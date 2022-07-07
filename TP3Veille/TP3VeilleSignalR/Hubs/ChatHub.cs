@@ -12,13 +12,6 @@ public record ConnectionResult(bool IsSuccess);
 
 public class ChatHub : Hub
 {
-    private readonly IUsersService _usersService;
-
-    public ChatHub(IUsersService usersService)
-    {
-        _usersService = usersService;
-    }
-    
     public async Task<ConnectionResult> Connect(string userId)
     {
         //var user = await _usersService.GetUserByName(userId) ?? await _usersService.CreateUser(userId);
@@ -51,7 +44,7 @@ public class ChatHub : Hub
 
     public async Task SendMessage(ChatMessage message)
     {
-        await Clients.Group(message.ConversationId).SendAsync("ReceiveMessage", message);
+        await Clients.GroupExcept(message.ConversationId, Context.ConnectionId).SendAsync("ReceiveMessage", message);
     }
 
     public async Task<ConnectionResult> Disconnect(string userId)
