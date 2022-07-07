@@ -51,7 +51,7 @@ public class ChatHub : Hub
 
     public async Task SendMessage(ChatMessage message)
     {
-        await Clients.Group(message.ConversationId).SendAsync("ReceiveMessage", message);
+        await Clients.GroupExcept(message.ConversationId, Context.ConnectionId).SendAsync("ReceiveMessage", message);
     }
 
     public async Task<ConnectionResult> Disconnect(string userId)

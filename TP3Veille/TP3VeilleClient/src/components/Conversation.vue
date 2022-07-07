@@ -14,7 +14,11 @@
       v-for="(m, index) in this.messages"
       :key="index"
     >
-      <img v-if="m.image" :src="m.image" />{{ m.message.message }}
+      <img
+        v-if="m.class === 'message-received'"
+        :src="m.image ?? require('@/assets/person-icon.png')"
+        alt=""
+      />{{ m.message.content }}
     </div>
   </div>
 </template>
@@ -31,7 +35,7 @@ import { defineComponent } from "vue";
 interface ChatMessage {
   userId: string;
   conversationId: string;
-  message: string;
+  content: string;
   date: Date;
 }
 
@@ -41,13 +45,13 @@ interface ChatMessageView {
   image: string | null;
 }
 
-interface GroupJoinOrLeave {
+interface ConversationInfo {
   userId: string;
-  groupId: string;
+  conversationId: string;
 }
 
-const SendMessage: HubCommandToken<ChatMessage, ChatMessage> = "SendMessage";
-const JoinGroup: HubCommandToken<GroupJoinOrLeave> = "JoinGroup";
+const SendMessage: HubCommandToken<ChatMessage> = "SendMessage";
+const JoinGroup: HubCommandToken<ConversationInfo> = "JoinConversation";
 const ReceiveMessage: HubEventToken<ChatMessage> = "ReceiveMessage";
 let signalr: SignalRService;
 
@@ -67,9 +71,9 @@ export default defineComponent({
     signalr = useSignalR();
   },
   created() {
-    let conversationJoin: GroupJoinOrLeave = {
+    let conversationJoin: ConversationInfo = {
       userId: this.userId,
-      groupId: this.conversationId,
+      conversationId: this.conversationId,
     };
     signalr
       .invoke(JoinGroup, conversationJoin)
@@ -79,7 +83,7 @@ export default defineComponent({
       let el: ChatMessageView = {
         message: message,
         class: "message-received",
-        image: "../assets/person-icon.png",
+        image: null,
       };
       this.messages.splice(0, 0, el);
     });
@@ -92,7 +96,7 @@ export default defineComponent({
       let chatMessage: ChatMessage = {
         userId: this.userId,
         conversationId: this.conversationId,
-        message: this.textInput,
+        content: this.textInput,
         date: new Date(),
       };
       signalr.send(SendMessage, chatMessage);
