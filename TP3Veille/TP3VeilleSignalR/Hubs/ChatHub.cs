@@ -150,5 +150,21 @@ public class ChatHub : Hub
         );
         return Result.Ok();
     }
+    
+    private bool ValidateUser(string userId)
+    {
+        var user = _usersService.GetByUsernameAsync(userId);
+        user.Wait();
+        var userIsValid = user.Result is not null && user.Result.ConnectionIds.Contains(Context.ConnectionId);
+        _logger.LogInformation("Checking if user is valid : {Validity}", (userIsValid ? "Yes" : "No"));
+        return userIsValid;
+    }
+
+    private bool ValidateUser(User? user)
+    {
+        var userIsValid = user is not null && user.ConnectionIds.Contains(Context.ConnectionId);
+        _logger.LogInformation("Checking if user is valid : {Validity}", (userIsValid ? "Yes" : "No"));
+        return userIsValid;
+    }
 }
 
