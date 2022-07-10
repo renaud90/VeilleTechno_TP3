@@ -19,12 +19,14 @@ public static class ChatHubEvents
 
 public class ChatHub : Hub
 {
-    //private readonly IUsersService _usersService;
+    private readonly IUsersService _usersService;
+    private readonly ILogger<ChatHub> _logger;
 
-    //public ChatHub(IUsersService usersService)
-    //{
-    //    _usersService = usersService;
-    //}
+    public ChatHub(IUsersService usersService, ILogger<ChatHub> logger)
+    {
+        _usersService = usersService;
+        _logger = logger;
+    }
     
     public async Task<Result<ChatUser>> Connect(string userId)
     {
