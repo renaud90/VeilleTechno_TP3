@@ -5,7 +5,7 @@ using TP3VeilleSignalR.Utilities;
 
 namespace TP3VeilleSignalR.Hubs;
 
-public record ChatMessage(string UserId, string ConversationId, string Content, DateTime Moment);
+public record ChatMessage(string UserId, string ConversationId, string Message, DateTime Moment);
 public record ChatUser(string UserId, IEnumerable<string> Friends, DateTime? LastTimeConnected);
 public record ConversationInfo(string UserId, string ConversationId);
 
@@ -19,14 +19,12 @@ public static class ChatHubEvents
 
 public class ChatHub : Hub
 {
-    private readonly IUsersService _usersService;
-    private readonly ILogger<ChatHub> _logger;
+    //private readonly IUsersService _usersService;
 
-    public ChatHub(IUsersService usersService, ILogger<ChatHub> logger)
-    {
-        _usersService = usersService;
-        _logger = logger;
-    }
+    //public ChatHub(IUsersService usersService)
+    //{
+    //    _usersService = usersService;
+    //}
     
     public async Task<Result<ChatUser>> Connect(string userId)
     {
@@ -65,6 +63,7 @@ public class ChatHub : Hub
 
     public async Task<Result<IEnumerable<ChatMessage>>> JoinConversation(ConversationInfo info)
     {
+
         if (!ValidateUser(info.UserId))
         {
             _logger.LogWarning(
@@ -101,6 +100,7 @@ public class ChatHub : Hub
 
     public async Task<Result> SendMessage(ChatMessage message)
     {
+
         if (!ValidateUser(message.UserId))
         {
             _logger.LogWarning(
@@ -120,6 +120,7 @@ public class ChatHub : Hub
             message.UserId,
             message.ConversationId
         );
+
         await Clients.GroupExcept(message.ConversationId, Context.ConnectionId).SendAsync("ReceiveMessage", message);
         return Result.Ok();
     }
@@ -146,22 +147,6 @@ public class ChatHub : Hub
             userId
         );
         return Result.Ok();
-    }
-
-    private bool ValidateUser(string userId)
-    {
-        var user = _usersService.GetByUsernameAsync(userId);
-        user.Wait();
-        var userIsValid = user.Result is not null && user.Result.ConnectionIds.Contains(Context.ConnectionId);
-        _logger.LogInformation("Checking if user is valid : {Validity}", (userIsValid ? "Yes" : "No"));
-        return userIsValid;
-    }
-    
-    private bool ValidateUser(User? user)
-    {
-        var userIsValid = user is not null && user.ConnectionIds.Contains(Context.ConnectionId);
-        _logger.LogInformation("Checking if user is valid : {Validity}", (userIsValid ? "Yes" : "No"));
-        return userIsValid;
     }
 }
 

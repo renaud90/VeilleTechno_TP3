@@ -6,7 +6,9 @@
     <div class="conversation">
       <slot name="conversation"></slot>
     </div>
-    <div class="profil">PROFIL</div>
+    <div class="profil">
+      <slot name="userProfile"></slot>
+    </div>
     <div class="personnes">PERSONNES CONNECTÉES</div>
     <div class="groupes">GROUPES</div>
   </div>
@@ -28,14 +30,11 @@ export default {
   },
   setup() {
     const signalr = useSignalR();
-    signalr
+    /*signalr
       .invoke(Connect, "test1234")
       .then(({ isSuccess }) =>
         console.log(`Résultat: ${isSuccess} Je suis connecté!`)
-      );
-  },
-  created() {
-    console.log("ALLO");
+      );*/
   },
 };
 </script>
@@ -93,20 +92,20 @@ a {
   grid-column-end: 5;
   grid-row-start: 1;
   grid-row-end: 3;
-  border: 2px solid yellow;
+  border: 2px solid lightgray;
 }
 .personnes {
   grid-column-start: 4;
   grid-column-end: 5;
   grid-row-start: 3;
   grid-row-end: 6;
-  border: 2px solid purple;
+  border: 2px solid lightgray;
 }
 .groupes {
   grid-column-start: 4;
   grid-column-end: 5;
   grid-row-start: 6;
   grid-row-end: 9;
-  border: 2px solid orange;
+  border: 2px solid lightgray;
 }
 </style>
