@@ -1,11 +1,6 @@
 <template>
   <div id="content">
-    <div
-      :style="{
-        display: this.userConnected ? 'display:none' : 'display:visible',
-      }"
-      id="user-connection"
-    >
+    <div :class="{ hidden: this.userConnection }" id="user-connection">
       <h3>Nom d'utilisateur:</h3>
       <input
         id="username-input"
@@ -16,13 +11,7 @@
         v-on:keyup.enter="tryConnect"
       />
     </div>
-    <div
-      :style="{
-        display: this.userConnected ? 'display:visible' : 'display:none',
-      }"
-    >
-      USAGER CONNECTÉ!
-    </div>
+    <div :class="{ hidden: !this.userConnection }">USAGER CONNECTÉ!</div>
   </div>
 </template>
 
@@ -34,15 +23,19 @@ import {
   SignalRService,
 } from "@quangdao/vue-signalr";
 import User from "@/models/User";
-import { mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
 
 let signalr: SignalRService;
 interface ConnectionResult {
   isSuccess: boolean;
-  user: User;
+  value: User;
+}
+interface DisconnectionResult {
+  isSuccess: boolean;
 }
 
 const Connect: HubCommandToken<string, ConnectionResult> = "Connect";
+const Disconnect: HubCommandToken<string, ConnectionResult> = "Disconnect";
 
 export default defineComponent({
   name: "UserProfileComponent",
@@ -56,17 +49,29 @@ export default defineComponent({
     signalr = useSignalR();
   },
   methods: {
-    ...mapMutations({ connect: "connect" }),
+    ...mapMutations({ connect: "connect", disconnect: "disconnect" }),
     tryConnect() {
       signalr
         .invoke(Connect, this.usernameText)
-        .then((reponse: ConnectionResult) => {
-          console.log(`Résultat: ${reponse.isSuccess} Je suis connecté!`);
-          console.log(reponse.user.username);
+        .then((response: ConnectionResult) => {
+          this.connect(response.value);
+          console.log(this.user);
+          document.addEventListener("beforeunload", this.disconnectUser);
         });
     },
+    disconnectUser: function (event: BeforeUnloadEvent) {
+      this.disconnect(this.user.userId);
+      console.log("CACA");
+    },
+  },
+  computed: {
+    ...mapState({ user: "user" }),
   },
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.hidden {
+  display: none;
+}
+</style>

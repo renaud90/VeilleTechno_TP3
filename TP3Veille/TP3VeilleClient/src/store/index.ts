@@ -14,6 +14,9 @@ export default createStore({
     connect(state: State, user: User) {
       state.user = user;
     },
+    disconnect(state: State) {
+      state.user = null;
+    },
   },
   actions: {},
   modules: {},
