@@ -11,7 +11,15 @@
         v-on:keyup.enter="tryConnect"
       />
     </div>
-    <div :class="{ hidden: !this.userConnection }">USAGER CONNECTÉ!</div>
+    <div :class="{ hidden: !this.userConnection }">
+      <h3 style="margin: 25px; auto;">
+        Bienvenue {{ this.user ? this.user.userId : "" }}
+      </h3>
+      <h5 style="margin: 25px; auto;">Aucun autre usagé connecté.</h5>
+      <h6 style="margin: 25px; auto;">
+        Vous avez échangé 0 messages sur notre plateforme!
+      </h6>
+    </div>
   </div>
 </template>
 
@@ -35,7 +43,7 @@ interface DisconnectionResult {
 }
 
 const Connect: HubCommandToken<string, ConnectionResult> = "Connect";
-const Disconnect: HubCommandToken<string, ConnectionResult> = "Disconnect";
+const Disconnect: HubCommandToken<string, DisconnectionResult> = "Disconnect";
 
 export default defineComponent({
   name: "UserProfileComponent",
@@ -56,12 +64,16 @@ export default defineComponent({
         .then((response: ConnectionResult) => {
           this.connect(response.value);
           console.log(this.user);
-          document.addEventListener("beforeunload", this.disconnectUser);
+          this.userConnection = true;
+          console.log(this.userConnection);
+          window.addEventListener("beforeunload", this.disconnectUser);
         });
     },
     disconnectUser: function (event: BeforeUnloadEvent) {
+      signalr.invoke(Disconnect, this.user.userId).then(() => {
+        this.userConnection = false;
+      });
       this.disconnect(this.user.userId);
-      console.log("CACA");
     },
   },
   computed: {
