@@ -9,7 +9,7 @@
         <li
           v-for="(u, index) in this.userList"
           :key="index"
-          class="conversation-link"
+          :class="{ 'conversation-link': true }"
           @click="this.openConversation('test1234')"
         >
           {{ u.userId }}
@@ -49,15 +49,18 @@ export default defineComponent({
     setInterval(this.loadUsers, 7000);
   },
   methods: {
-    ...mapMutations({ openConversation: "openConversation" }),
+    ...mapMutations({
+      openConversation: "openConversation",
+      setUserCount: "setUserCount",
+    }),
     loadUsers() {
       if (!this.user) {
-        console.log("PAS CONNECTÉ!");
         return;
       } else {
         console.log("chargement des usagers...");
         signalr.invoke(GetAllUsers).then((response: User[]) => {
           this.userList = response.filter((_) => _.userId != this.user.userId);
+          this.setUserCount(this.userList.length);
         });
       }
     },

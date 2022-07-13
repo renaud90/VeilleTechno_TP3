@@ -20,7 +20,7 @@
         v-if="m.class === 'message-received'"
         :src="m.image ?? require('@/assets/person-icon.png')"
         alt=""
-      />{{ m.message.content }}
+      />{{ m.message.message }}
     </div>
   </div>
 </template>
@@ -38,7 +38,7 @@ import { mapState } from "vuex";
 interface ChatMessage {
   userId: string;
   conversationId: string;
-  content: string;
+  message: string;
   date: Date;
 }
 
@@ -87,7 +87,7 @@ export default defineComponent({
       let chatMessage: ChatMessage = {
         userId: this.user.userId,
         conversationId: this.activeConversationId,
-        content: this.textInput,
+        message: this.textInput,
         date: new Date(),
       };
       signalr.send(SendMessage, chatMessage);
@@ -102,6 +102,15 @@ export default defineComponent({
   },
   computed: {
     ...mapState({ user: "user", activeConversationId: "activeConversationId" }),
+  },
+  watch: {
+    activeConversationId() {
+      let conversationInfo: ConversationInfo = {
+        userId: this.user.userId,
+        conversationId: this.activeConversationId,
+      };
+      signalr.invoke(JoinGroup, conversationInfo);
+    },
   },
 });
 </script>

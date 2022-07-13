@@ -4,12 +4,14 @@ import User from "@/models/User";
 export type State = {
   user: User | null;
   activeConversationId: string;
+  userCount: number | null;
 };
 
 export default createStore({
   state: {
     user: null,
     activeConversationId: "",
+    userCount: null,
   },
   getters: {},
   mutations: {
@@ -21,6 +23,9 @@ export default createStore({
     },
     openConversation(state: State, activeConversationId: string) {
       state.activeConversationId = activeConversationId;
+    },
+    setUserCount(state: State, userCount: number) {
+      state.userCount = userCount;
     },
   },
   actions: {},

@@ -18,7 +18,9 @@
       <h3 style="margin: 25px; auto;">
         Bienvenue {{ this.user ? this.user.userId : "" }}
       </h3>
-      <h5 style="margin: 25px; auto;">Aucun autre usagé connecté.</h5>
+      <h5 style="margin: 25px; auto;">
+        {{ this.userCount }} autre(s) usager(s) connecté(s).
+      </h5>
       <h6 style="margin: 25px; auto;">
         Vous avez échangé 0 messages sur notre plateforme!
       </h6>
@@ -66,7 +68,6 @@ export default defineComponent({
         .invoke(Connect, this.usernameText)
         .then((response: ConnectionResult) => {
           this.connect(response.value);
-          console.log(this.userConnection);
           window.addEventListener("beforeunload", this.disconnectUser);
         });
     },
@@ -76,7 +77,7 @@ export default defineComponent({
     },
   },
   computed: {
-    ...mapState({ user: "user" }),
+    ...mapState({ user: "user", userCount: "userCount" }),
   },
   watch: {
     user() {
