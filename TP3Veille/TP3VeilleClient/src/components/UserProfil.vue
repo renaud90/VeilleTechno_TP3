@@ -1,15 +1,18 @@
 <template>
   <div id="content">
     <div :class="{ hidden: this.userConnection }" id="user-connection">
-      <h3>Nom d'utilisateur:</h3>
-      <input
-        id="username-input"
-        type="text"
-        v-model="usernameText"
-        maxlength="35"
-        minlength="6"
-        v-on:keyup.enter="tryConnect"
-      />
+      <h3 style="margin-bottom: 25px">Connexion</h3>
+      <label style="fint-size: 1.5em">
+        Nom d'utilisateur:
+        <input
+          id="username-input"
+          type="text"
+          v-model="usernameText"
+          maxlength="35"
+          minlength="6"
+          v-on:keyup.enter="tryConnect"
+        />
+      </label>
     </div>
     <div :class="{ hidden: !this.userConnection }">
       <h3 style="margin: 25px; auto;">
@@ -63,21 +66,22 @@ export default defineComponent({
         .invoke(Connect, this.usernameText)
         .then((response: ConnectionResult) => {
           this.connect(response.value);
-          console.log(this.user);
-          this.userConnection = true;
           console.log(this.userConnection);
           window.addEventListener("beforeunload", this.disconnectUser);
         });
     },
     disconnectUser: function (event: BeforeUnloadEvent) {
-      signalr.invoke(Disconnect, this.user.userId).then(() => {
-        this.userConnection = false;
-      });
+      signalr.invoke(Disconnect, this.user.userId);
       this.disconnect(this.user.userId);
     },
   },
   computed: {
     ...mapState({ user: "user" }),
+  },
+  watch: {
+    user() {
+      this.userConnection = this.user !== null;
+    },
   },
 });
 </script>

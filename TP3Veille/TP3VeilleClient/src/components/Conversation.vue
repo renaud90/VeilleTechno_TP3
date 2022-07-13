@@ -6,6 +6,7 @@
         type="text"
         v-model="textInput"
         v-on:keyup.enter="sendMessage"
+        :disabled="!this.user || !this.activeConversationId"
       />
     </div>
     <div
@@ -32,6 +33,7 @@ import {
   SignalRService,
 } from "@quangdao/vue-signalr";
 import { defineComponent } from "vue";
+import { mapState } from "vuex";
 
 interface ChatMessage {
   userId: string;
@@ -58,10 +60,6 @@ let signalr: SignalRService;
 
 export default defineComponent({
   name: "ConversationComponent",
-  props: {
-    userId: { type: String, required: true },
-    conversationId: { type: String, required: true },
-  },
   data() {
     return {
       textInput: "",
@@ -72,14 +70,6 @@ export default defineComponent({
     signalr = useSignalR();
   },
   created() {
-    let conversationJoin: ConversationInfo = {
-      userId: this.userId,
-      conversationId: this.conversationId,
-    };
-    signalr
-      .invoke(JoinGroup, conversationJoin)
-      .then(() => console.log("Groupe joint!"));
-
     signalr.on(ReceiveMessage, (message) => {
       let el: ChatMessageView = {
         message: message,
@@ -95,8 +85,8 @@ export default defineComponent({
         return;
       }
       let chatMessage: ChatMessage = {
-        userId: this.userId,
-        conversationId: this.conversationId,
+        userId: this.user.userId,
+        conversationId: this.activeConversationId,
         content: this.textInput,
         date: new Date(),
       };
@@ -109,6 +99,9 @@ export default defineComponent({
       this.messages.splice(0, 0, el);
       this.textInput = "";
     },
+  },
+  computed: {
+    ...mapState({ user: "user", activeConversationId: "activeConversationId" }),
   },
 });
 </script>
