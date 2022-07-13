@@ -6,6 +6,7 @@
         type="text"
         v-model="textInput"
         v-on:keyup.enter="sendMessage"
+        :disabled="!this.user || !this.activeConversationId"
       />
     </div>
     <div
@@ -19,7 +20,7 @@
         v-if="m.class === 'message-received'"
         :src="m.image ?? require('@/assets/person-icon.png')"
         alt=""
-      />{{ m.message.content }}
+      />{{ m.message.message }}
     </div>
   </div>
 </template>
@@ -32,11 +33,12 @@ import {
   SignalRService,
 } from "@quangdao/vue-signalr";
 import { defineComponent } from "vue";
+import { mapState } from "vuex";
 
 interface ChatMessage {
   userId: string;
   conversationId: string;
-  content: string;
+  message: string;
   date: Date;
 }
 
@@ -58,10 +60,6 @@ let signalr: SignalRService;
 
 export default defineComponent({
   name: "ConversationComponent",
-  props: {
-    userId: { type: String, required: true },
-    conversationId: { type: String, required: true },
-  },
   data() {
     return {
       textInput: "",
@@ -72,14 +70,6 @@ export default defineComponent({
     signalr = useSignalR();
   },
   created() {
-    let conversationJoin: ConversationInfo = {
-      userId: this.userId,
-      conversationId: this.conversationId,
-    };
-    signalr
-      .invoke(JoinGroup, conversationJoin)
-      .then(() => console.log("Groupe joint!"));
-
     signalr.on(ReceiveMessage, (message) => {
       let el: ChatMessageView = {
         message: message,
@@ -95,9 +85,9 @@ export default defineComponent({
         return;
       }
       let chatMessage: ChatMessage = {
-        userId: this.userId,
-        conversationId: this.conversationId,
-        content: this.textInput,
+        userId: this.user.userId,
+        conversationId: this.activeConversationId,
+        message: this.textInput,
         date: new Date(),
       };
       signalr.send(SendMessage, chatMessage);
@@ -108,6 +98,18 @@ export default defineComponent({
       };
       this.messages.splice(0, 0, el);
       this.textInput = "";
+    },
+  },
+  computed: {
+    ...mapState({ user: "user", activeConversationId: "activeConversationId" }),
+  },
+  watch: {
+    activeConversationId() {
+      let conversationInfo: ConversationInfo = {
+        userId: this.user.userId,
+        conversationId: this.activeConversationId,
+      };
+      signalr.invoke(JoinGroup, conversationInfo);
     },
   },
 });

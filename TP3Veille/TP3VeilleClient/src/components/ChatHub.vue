@@ -3,20 +3,21 @@
     <div class="entete">
       <slot name="entete"></slot>
     </div>
-    <div class="conversation">
+    <div :class="{ conversation: true }">
       <slot name="conversation"></slot>
     </div>
     <div class="profil">
       <slot name="userProfile"></slot>
     </div>
-    <div class="personnes">PERSONNES CONNECTÉES</div>
-    <div class="groupes">GROUPES</div>
+    <div :class="{ personnes: true, scrollable: this.user !== null }">
+      <slot name="userList"></slot>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { useSignalR, HubCommandToken } from "@quangdao/vue-signalr";
-
+import { mapState } from "vuex";
 interface ConnectionResult {
   isSuccess: boolean;
 }
@@ -28,6 +29,11 @@ export default {
   props: {
     isConnected: Boolean,
   },
+  data() {
+    return {
+      userConnection: false,
+    };
+  },
   setup() {
     const signalr = useSignalR();
     /*signalr
@@ -35,6 +41,9 @@ export default {
       .then(({ isSuccess }) =>
         console.log(`Résultat: ${isSuccess} Je suis connecté!`)
       );*/
+  },
+  computed: {
+    ...mapState({ user: "user" }),
   },
 };
 </script>
@@ -63,7 +72,6 @@ a {
 .container {
   display: flex;
   height: 100%;
-  overflow: hidden;
 }
 .column-reverse {
   flex-direction: column-reverse;
@@ -86,6 +94,7 @@ a {
   grid-row-end: 9;
   border: 2px solid lightgray;
   border-radius: 5px;
+  overflow: scroll;
 }
 .profil {
   grid-column-start: 4;
@@ -98,14 +107,10 @@ a {
   grid-column-start: 4;
   grid-column-end: 5;
   grid-row-start: 3;
-  grid-row-end: 6;
-  border: 2px solid lightgray;
-}
-.groupes {
-  grid-column-start: 4;
-  grid-column-end: 5;
-  grid-row-start: 6;
   grid-row-end: 9;
   border: 2px solid lightgray;
+}
+.scrollable {
+  overflow: scroll;
 }
 </style>
