@@ -108,34 +108,39 @@ export default defineComponent({
   },
   watch: {
     activeConversationId() {
-      let conversationInfo: ConversationInfo = {
-        userId: this.user.userId,
-        conversationId: this.activeConversationId,
-      };
-      signalr.invoke(JoinGroup, conversationInfo).then((messages) => {
-        this.messages = [];
-        if (messages.value) {
-          messages.value.reverse();
+      if (this.activeConversationId) {
+        let conversationInfo: ConversationInfo = {
+          userId: this.user.userId,
+          conversationId: this.activeConversationId,
+        };
+        signalr.invoke(JoinGroup, conversationInfo).then((messages) => {
+          this.messages = [];
+          if (messages.value) {
+            messages.value.reverse();
 
-          messages.value.forEach((m) => {
-            let chatMessage: ChatMessage = {
-              userId: m.userId,
-              conversationId: m.conversationId,
-              content: m.content,
-              date: m.moment,
-            };
-            let messageView: ChatMessageView = {
-              message: chatMessage,
-              class:
-                this.user.userId === m.userId
-                  ? "message-sent"
-                  : "message-received",
-              image: null,
-            };
-            this.messages.push(messageView);
-          });
-        }
-      });
+            messages.value.forEach((m) => {
+              let chatMessage: ChatMessage = {
+                userId: m.userId,
+                conversationId: m.conversationId,
+                content: m.content,
+                date: m.moment,
+              };
+              let messageView: ChatMessageView = {
+                message: chatMessage,
+                class:
+                  this.user.userId === m.userId
+                    ? "message-sent"
+                    : "message-received",
+                image: null,
+              };
+              this.messages.push(messageView);
+            });
+          }
+        });
+      } else {
+        this.interlocutorId = ""
+        this.messages = [];
+      }
     },
   },
 });

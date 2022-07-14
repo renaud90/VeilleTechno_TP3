@@ -100,6 +100,8 @@ export default defineComponent({
       if (this.user) {
         this.userConnection = this.user !== null;
         this.loadUsers();
+      } else {
+        this.userList = [];
       }
     },
   },
