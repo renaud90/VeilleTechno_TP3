@@ -7,6 +7,7 @@ using TP3VeilleSignalR.Utilities;
 namespace TP3VeilleSignalR.Hubs;
 public record ChatUser(string UserId, DateTime? LastTimeConnected);
 public record ConversationInfo(string UserId, string ConversationId);
+public record ConversationMembers(string UserId, string OtherUserId);
 
 public static class ChatHubEvents
 {
@@ -78,14 +79,9 @@ public class ChatHub : Hub
         return (await _usersService.GetAllAsync(u => u.ConnectionIds.Count > 0)).ToChatUsers();
     }
 
-    public string GetConversationId(string userId, string otherUserId)
-    {
-        if (string.Compare(userId, otherUserId, StringComparison.Ordinal) <= 0)
-            return $"{userId}:{otherUserId}";
-        else
-            return $"{otherUserId}:{userId}";
-    }
-    
+    public string GetConversationId(ConversationMembers members) 
+        => string.Compare(members.UserId, members.OtherUserId, StringComparison.Ordinal) <= 0 ? $"{members.UserId}:{members.OtherUserId}" : $"{members.OtherUserId}:{members.UserId}";
+
     public async Task<Result<IEnumerable<Message>>> JoinConversation(ConversationInfo info)
     {
         if (!ValidateUser(info.UserId))
