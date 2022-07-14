@@ -5,6 +5,10 @@ using TP3VeilleSignalR.Data.Models;
 
 namespace TP3VeilleSignalR.Services;
 
+public record ConversationData(string ConversationId, string InterlocutorId);
+
+public record UserData(string UserId, IEnumerable<ConversationData> Conversations);
+
 public class ConversationsService : IConversationsService
 {
     private readonly IMongoCollection<Conversation> _conversationsCollection;
@@ -38,17 +42,27 @@ public class ConversationsService : IConversationsService
         return conversation is null ? new List<Message>() : conversation.Messages.Where(predicate);
     }
 
-    public async Task<IEnumerable<User>> GetUsersForConversationAsync(string conversationId)
+    public async Task<UserData> GetConversationsDataForUser(string userId)
     {
-        var conversation = await _conversationsCollection.Find(c => c.Name == conversationId).FirstOrDefaultAsync();
-        
-        if (conversation is null)
-            return new List<User>();
+        var user = await _usersCollection.Find(u => u.Username == userId).FirstOrDefaultAsync();
 
-        var users = await _usersCollection.Find(u => conversation.Participants.Contains(u.Username)).ToListAsync();
-        return users ?? new List<User>();
+        if (user is null)
+            return new UserData(userId, new List<ConversationData>());
+
+        var conversations = await _conversationsCollection.Find(c => c.Participants.Contains(userId)).ToListAsync();
+        if (conversations is null || !conversations.Any())
+        {
+            return new UserData(userId, new List<ConversationData>());
+        }
+
+        return new UserData(
+            userId, 
+            conversations.Select(c =>
+                new ConversationData(c.Name, c.Participants.FirstOrDefault(p => p != userId) ?? string.Empty)
+            )
+        );
     }
-
+    
     public async Task<Conversation?> CreateAsync(string conversationId)
     {
         var conversation = await _conversationsCollection.Find(c => c.Name == conversationId).FirstOrDefaultAsync();
