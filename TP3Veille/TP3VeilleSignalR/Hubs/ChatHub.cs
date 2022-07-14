@@ -67,6 +67,8 @@ public class ChatHub : Hub
         );
         
         var userData = await _conversationsService.GetConversationsDataForUser(user.Username);
+
+        await Clients.All.SendAsync("UserConnected");
         return Result.Ok(userData);
     }
 
@@ -225,6 +227,7 @@ public class ChatHub : Hub
             nameof(Disconnect),
             userId
         );
+        await Clients.All.SendAsync("UserDisconnected");
         return Result.Ok();
     }
     
