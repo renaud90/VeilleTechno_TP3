@@ -9,7 +9,6 @@ public static class MappingExtensions
     {
         return new ChatUser(
             UserId: user.Username,
-            Friends: user.Friends.Select(f => f.Username),
             LastTimeConnected: user.LastTimeConnected
         );
     }

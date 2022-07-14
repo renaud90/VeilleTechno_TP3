@@ -4,7 +4,7 @@ using TP3VeilleSignalR.Services;
 using TP3VeilleSignalR.Utilities;
 
 namespace TP3VeilleSignalR.Hubs;
-public record ChatUser(string UserId, IEnumerable<string> Friends, DateTime? LastTimeConnected);
+public record ChatUser(string UserId, DateTime? LastTimeConnected);
 public record ConversationInfo(string UserId, string ConversationId);
 
 public static class ChatHubEvents
@@ -28,7 +28,7 @@ public class ChatHub : Hub
         _logger = logger;
     }
     
-    public async Task<Result<ChatUser>> Connect(string userId)
+    public async Task<Result<UserData>> Connect(string userId)
     {
         var users = await _usersService.GetAllAsync(u => u.ConnectionIds.Contains(Context.ConnectionId));
         if (users.Any())
@@ -38,10 +38,10 @@ public class ChatHub : Hub
                 "[{Method}] Connection already in use by another user.",
                 nameof(Connect)
             );
-            return Result.Fail<ChatUser>($"Connection already used by another user.");
+            return Result.Fail<UserData>($"Connection already used by another user.");
         }
 
-        var user = await _usersService.GetByUsernameAsync(userId);
+        var user = await _usersService.GetByUsernameAsync(userId) ?? await _usersService.CreateAsync(userId);
         if (user is null || user.ConnectionIds.Count > 0)
         {
             _logger.LogWarning(
@@ -50,7 +50,7 @@ public class ChatHub : Hub
                 nameof(Connect),
                 userId
             );
-            return Result.Fail<ChatUser>($"Cannot connect user {userId}.");
+            return Result.Fail<UserData>($"Cannot connect user {userId}.");
         }
         
         user.LastTimeConnected = DateTime.Now;
@@ -64,7 +64,9 @@ public class ChatHub : Hub
             userId,
             Context.ConnectionId
         );
-        return Result.Ok(user.ToChatUser());
+        
+        var userData = await _conversationsService.GetConversationsDataForUser(user.Username);
+        return Result.Ok(userData);
     }
 
     public async Task<IEnumerable<ChatUser>> GetAllUsers()
