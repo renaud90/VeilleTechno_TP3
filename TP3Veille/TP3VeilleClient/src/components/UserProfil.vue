@@ -1,27 +1,29 @@
 <template>
   <div id="content">
-    <div
-      :style="{
-        display: this.userConnected ? 'display:none' : 'display:visible',
-      }"
-      id="user-connection"
-    >
-      <h3>Nom d'utilisateur:</h3>
-      <input
-        id="username-input"
-        type="text"
-        v-model="usernameText"
-        maxlength="35"
-        minlength="6"
-        v-on:keyup.enter="tryConnect"
-      />
+    <div :class="{ hidden: this.userConnection }" id="user-connection">
+      <h3 style="margin-bottom: 25px">Connexion</h3>
+      <label style="fint-size: 1.5em">
+        Nom d'utilisateur:
+        <input
+          id="username-input"
+          type="text"
+          v-model="usernameText"
+          maxlength="35"
+          minlength="6"
+          v-on:keyup.enter="tryConnect"
+        />
+      </label>
     </div>
-    <div
-      :style="{
-        display: this.userConnected ? 'display:visible' : 'display:none',
-      }"
-    >
-      USAGER CONNECTÉ!
+    <div :class="{ hidden: !this.userConnection }">
+      <h3 style="margin: 25px; auto;">
+        Bienvenue {{ this.user ? this.user.userId : "" }}
+      </h3>
+      <h5 style="margin: 25px; auto;">
+        {{ this.userCount }} autre(s) usager(s) connecté(s).
+      </h5>
+      <h6 style="margin: 25px; auto;">
+        Vous avez échangé 0 messages sur notre plateforme!
+      </h6>
     </div>
   </div>
 </template>
@@ -34,15 +36,19 @@ import {
   SignalRService,
 } from "@quangdao/vue-signalr";
 import User from "@/models/User";
-import { mapMutations } from "vuex";
+import { mapMutations, mapState } from "vuex";
 
 let signalr: SignalRService;
 interface ConnectionResult {
   isSuccess: boolean;
-  user: User;
+  value: User;
+}
+interface DisconnectionResult {
+  isSuccess: boolean;
 }
 
 const Connect: HubCommandToken<string, ConnectionResult> = "Connect";
+const Disconnect: HubCommandToken<string, DisconnectionResult> = "Disconnect";
 
 export default defineComponent({
   name: "UserProfileComponent",
@@ -56,17 +62,33 @@ export default defineComponent({
     signalr = useSignalR();
   },
   methods: {
-    ...mapMutations({ connect: "connect" }),
+    ...mapMutations({ connect: "connect", disconnect: "disconnect" }),
     tryConnect() {
       signalr
         .invoke(Connect, this.usernameText)
-        .then((reponse: ConnectionResult) => {
-          console.log(`Résultat: ${reponse.isSuccess} Je suis connecté!`);
-          console.log(reponse.user.username);
+        .then((response: ConnectionResult) => {
+          this.connect(response.value);
+          window.addEventListener("beforeunload", this.disconnectUser);
         });
+    },
+    disconnectUser: function (event: BeforeUnloadEvent) {
+      signalr.invoke(Disconnect, this.user.userId);
+      this.disconnect(this.user.userId);
+    },
+  },
+  computed: {
+    ...mapState({ user: "user", userCount: "userCount" }),
+  },
+  watch: {
+    user() {
+      this.userConnection = this.user !== null;
     },
   },
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.hidden {
+  display: none;
+}
+</style>
