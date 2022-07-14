@@ -9,8 +9,11 @@
         <li
           v-for="(u, index) in this.userList"
           :key="index"
-          :class="{ 'conversation-link': true }"
-          @click="this.openConversation('test1234')"
+          :class="{
+            'conversation-link': true,
+            bold: this.interlocutorId === u.userId,
+          }"
+          @click="this.tryOpenConversation(this.user.userId, u.userId)"
         >
           {{ u.userId }}
         </li>
@@ -24,14 +27,24 @@ import { defineComponent } from "vue";
 import {
   useSignalR,
   HubCommandToken,
+  HubEventToken,
   SignalRService,
 } from "@quangdao/vue-signalr";
-import User from "@/models/User";
+import { User, UserData, ConversationData } from "@/models/User";
 import { mapMutations, mapState } from "vuex";
 
 let signalr: SignalRService;
 
+interface IdsSearch {
+  userId: string;
+  otherUserId: string;
+}
+
 const GetAllUsers: HubCommandToken<null, User[]> = "GetAllUsers";
+const GetConversationId: HubCommandToken<IdsSearch, string> =
+  "GetConversationId";
+const OnConnect: HubEventToken<null> = "UserConnected";
+const OnDisconnect: HubEventToken<null> = "UserDisconnected";
 
 export default defineComponent({
   name: "UserListComponent",
@@ -46,27 +59,46 @@ export default defineComponent({
     signalr = useSignalR();
   },
   mounted() {
-    setInterval(this.loadUsers, 7000);
+    signalr.on(OnConnect, () => {
+      this.loadUsers();
+    });
+    signalr.on(OnDisconnect, () => {
+      this.loadUsers();
+    });
   },
   methods: {
     ...mapMutations({
-      openConversation: "openConversation",
+      setActiveConversationId: "setActiveConversationId",
+      setInterlocutorId: "setInterlocutorId",
       setUserCount: "setUserCount",
     }),
     loadUsers() {
       if (!this.user) {
         return;
       } else {
-        console.log("chargement des usagers...");
         signalr.invoke(GetAllUsers).then((response: User[]) => {
           this.userList = response.filter((_) => _.userId != this.user.userId);
           this.setUserCount(this.userList.length);
         });
       }
     },
+    tryOpenConversation(currentUserId: string, interlocutorId: string) {
+      let ids: IdsSearch = {
+        userId: currentUserId,
+        otherUserId: interlocutorId,
+      };
+      signalr.invoke(GetConversationId, ids).then((conversationId) => {
+        this.setActiveConversationId(conversationId);
+        this.setInterlocutorId(interlocutorId);
+      });
+    },
   },
   computed: {
-    ...mapState({ user: "user", activeConversationId: "activeConversationId" }),
+    ...mapState({
+      user: "user",
+      activeConversationId: "activeConversationId",
+      interlocutorId: "interlocutorId",
+    }),
   },
   watch: {
     user() {

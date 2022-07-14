@@ -1,7 +1,21 @@
-interface User {
+export interface UserData {
   userId: string | null;
-  friends: string[] | null;
-  //LastTimeConnected: Date | null;
+  conversationData: ConversationData[] | null;
 }
 
-export default User;
+export interface ConversationData {
+  conversationId: string | null;
+  interlocutorId: string | null;
+}
+
+export interface User {
+  userId: string | null;
+  lastTimeConnected: Date | null;
+}
+
+export interface Message {
+  content: string;
+  userId: string;
+  conversationId: string;
+  moment: Date;
+}

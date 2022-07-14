@@ -36,11 +36,6 @@ export default {
   },
   setup() {
     const signalr = useSignalR();
-    /*signalr
-      .invoke(Connect, "test1234")
-      .then(({ isSuccess }) =>
-        console.log(`Résultat: ${isSuccess} Je suis connecté!`)
-      );*/
   },
   computed: {
     ...mapState({ user: "user" }),
@@ -112,5 +107,8 @@ a {
 }
 .scrollable {
   overflow: scroll;
+}
+.bold {
+  font-weight: bold;
 }
 </style>

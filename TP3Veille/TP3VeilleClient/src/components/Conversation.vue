@@ -1,26 +1,37 @@
 <template>
-  <div class="container column-reverse">
-    <div id="div-conv-input">
-      <input
-        id="conv-input"
-        type="text"
-        v-model="textInput"
-        v-on:keyup.enter="sendMessage"
-        :disabled="!this.user || !this.activeConversationId"
-      />
-    </div>
-    <div
-      :class="m.class"
-      class="message"
-      v-for="(m, index) in this.messages"
-      :key="index"
-    >
+  <div style="height: 100%">
+    <div style="height: 25px; text-align: left; margin: 5px 0px 0px 5px">
       <img
+        v-if="this.interlocutorId"
         class="user-image"
-        v-if="m.class === 'message-received'"
-        :src="m.image ?? require('@/assets/person-icon.png')"
+        :src="require('@/assets/person-icon.png')"
         alt=""
-      />{{ m.message.message }}
+      />
+      {{ this.interlocutorId }}
+    </div>
+    <div class="container column-reverse" id="conv-window">
+      <div id="div-conv-input">
+        <input
+          id="conv-input"
+          type="text"
+          v-model="textInput"
+          v-on:keyup.enter="sendMessage"
+          :disabled="!this.user || !this.activeConversationId"
+        />
+      </div>
+      <div
+        :class="m.class"
+        class="message"
+        v-for="(m, index) in this.messages"
+        :key="index"
+      >
+        <img
+          class="user-image"
+          v-if="m.class === 'message-received'"
+          :src="m.image ?? require('@/assets/person-icon.png')"
+          alt=""
+        />{{ m.message.content }}
+      </div>
     </div>
   </div>
 </template>
@@ -34,11 +45,12 @@ import {
 } from "@quangdao/vue-signalr";
 import { defineComponent } from "vue";
 import { mapState } from "vuex";
+import { Message } from "@/models/User";
 
 interface ChatMessage {
   userId: string;
   conversationId: string;
-  message: string;
+  content: string;
   date: Date;
 }
 
@@ -53,8 +65,14 @@ interface ConversationInfo {
   conversationId: string;
 }
 
+interface MessagesResult {
+  isSuccess: boolean;
+  value: Message[];
+}
+
 const SendMessage: HubCommandToken<ChatMessage> = "SendMessage";
-const JoinGroup: HubCommandToken<ConversationInfo> = "JoinConversation";
+const JoinGroup: HubCommandToken<ConversationInfo, MessagesResult> =
+  "JoinConversation";
 const ReceiveMessage: HubEventToken<ChatMessage> = "ReceiveMessage";
 let signalr: SignalRService;
 
@@ -87,7 +105,7 @@ export default defineComponent({
       let chatMessage: ChatMessage = {
         userId: this.user.userId,
         conversationId: this.activeConversationId,
-        message: this.textInput,
+        content: this.textInput,
         date: new Date(),
       };
       signalr.send(SendMessage, chatMessage);
@@ -101,7 +119,11 @@ export default defineComponent({
     },
   },
   computed: {
-    ...mapState({ user: "user", activeConversationId: "activeConversationId" }),
+    ...mapState({
+      user: "user",
+      activeConversationId: "activeConversationId",
+      interlocutorId: "interlocutorId",
+    }),
   },
   watch: {
     activeConversationId() {
@@ -109,7 +131,30 @@ export default defineComponent({
         userId: this.user.userId,
         conversationId: this.activeConversationId,
       };
-      signalr.invoke(JoinGroup, conversationInfo);
+      signalr.invoke(JoinGroup, conversationInfo).then((messages) => {
+        this.messages = [];
+        if (messages.value) {
+          messages.value.reverse();
+
+          messages.value.forEach((m) => {
+            let chatMessage: ChatMessage = {
+              userId: m.userId,
+              conversationId: m.conversationId,
+              content: m.content,
+              date: m.moment,
+            };
+            let messageView: ChatMessageView = {
+              message: chatMessage,
+              class:
+                this.user.userId === m.userId
+                  ? "message-sent"
+                  : "message-received",
+              image: null,
+            };
+            this.messages.push(messageView);
+          });
+        }
+      });
     },
   },
 });
@@ -144,6 +189,9 @@ export default defineComponent({
   border-radius: 20px;
   margin: 5px;
   height: 50px;
+}
+#conv-window {
+  height: calc(100% - 30px);
 }
 #conv-input {
   margin: auto;

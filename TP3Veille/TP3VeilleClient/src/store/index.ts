@@ -1,9 +1,10 @@
 import { createStore } from "vuex";
-import User from "@/models/User";
+import { User, UserData } from "@/models/User";
 
 export type State = {
-  user: User | null;
-  activeConversationId: string;
+  user: UserData | null;
+  activeConversationId: string | null;
+  interlocutorId: string | null;
   userCount: number | null;
 };
 
@@ -11,18 +12,22 @@ export default createStore({
   state: {
     user: null,
     activeConversationId: "",
+    interlocutorId: "",
     userCount: null,
   },
   getters: {},
   mutations: {
-    connect(state: State, user: User) {
+    connect(state: State, user: UserData) {
       state.user = user;
     },
     disconnect(state: State) {
       state.user = null;
     },
-    openConversation(state: State, activeConversationId: string) {
+    setActiveConversationId(state: State, activeConversationId: string) {
       state.activeConversationId = activeConversationId;
+    },
+    setInterlocutorId(state: State, interlocutorId: string) {
+      state.interlocutorId = interlocutorId;
     },
     setUserCount(state: State, userCount: number) {
       state.userCount = userCount;

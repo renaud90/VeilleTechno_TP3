@@ -15,15 +15,12 @@
       </label>
     </div>
     <div :class="{ hidden: !this.userConnection }">
-      <h3 style="margin: 25px; auto;">
+      <h3 style="margin: 35px; auto;">
         Bienvenue {{ this.user ? this.user.userId : "" }}
       </h3>
-      <h5 style="margin: 25px; auto;">
+      <h5 style="margin: 35px; auto;">
         {{ this.userCount }} autre(s) usager(s) connecté(s).
       </h5>
-      <h6 style="margin: 25px; auto;">
-        Vous avez échangé 0 messages sur notre plateforme!
-      </h6>
     </div>
   </div>
 </template>
@@ -35,13 +32,13 @@ import {
   HubCommandToken,
   SignalRService,
 } from "@quangdao/vue-signalr";
-import User from "@/models/User";
+import { UserData } from "@/models/User";
 import { mapMutations, mapState } from "vuex";
 
 let signalr: SignalRService;
 interface ConnectionResult {
   isSuccess: boolean;
-  value: User;
+  value: UserData;
 }
 interface DisconnectionResult {
   isSuccess: boolean;
