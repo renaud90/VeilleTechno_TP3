@@ -1,26 +1,24 @@
 <template>
   <div id="content">
-    <div :class="{ hidden: this.userConnection }" id="user-connection">
+    <div :class="{ hidden: userConnection }" id="user-connection">
       <h3 style="margin-bottom: 25px">Connexion</h3>
       <label style="fint-size: 1.5em">
         Nom d'utilisateur:
-        <input
-          id="username-input"
-          type="text"
-          v-model="usernameText"
-          maxlength="35"
-          minlength="6"
-          v-on:keyup.enter="tryConnect"
-        />
+        <input id="username-input" type="text" v-model="usernameText" maxlength="35" minlength="6"
+          @keyup.enter="tryConnect" />
       </label>
+      <div style="margin-top: 1em;">
+        <button @click="tryConnect">Connexion</button>
+      </div>
     </div>
-    <div :class="{ hidden: !this.userConnection }">
+    <div :class="{ hidden: !userConnection }">
       <h3 style="margin: 35px; auto;">
-        Bienvenue {{ this.user ? this.user.userId : "" }}
+        Bienvenue {{ user ? user.userId : "" }}
       </h3>
       <h5 style="margin: 35px; auto;">
-        {{ this.userCount }} autre(s) usager(s) connecté(s).
+        {{ userCount }} autre(s) usager(s) connecté(s).
       </h5>
+      <button @click="disconnectUser">Déconnexion</button>
     </div>
   </div>
 </template>
@@ -32,7 +30,7 @@ import {
   HubCommandToken,
   SignalRService,
 } from "@quangdao/vue-signalr";
-import { UserData } from "@/models/User";
+import { UserData } from "../models/User";
 import { mapMutations, mapState } from "vuex";
 
 let signalr: SignalRService;
@@ -69,8 +67,10 @@ export default defineComponent({
         });
     },
     disconnectUser: function (event: BeforeUnloadEvent) {
-      signalr.invoke(Disconnect, this.user.userId);
-      this.disconnect(this.user.userId);
+      if (this.userConnection) {
+        signalr.invoke(Disconnect, this.user.userId);
+        this.disconnect(this.user.userId);
+      }
     },
   },
   computed: {
@@ -87,5 +87,11 @@ export default defineComponent({
 <style scoped>
 .hidden {
   display: none;
+}
+
+button {
+  width: 10em;
+  margin-left: 1em;
+  height: 1.7em;
 }
 </style>

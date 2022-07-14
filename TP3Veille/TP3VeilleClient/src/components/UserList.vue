@@ -1,20 +1,15 @@
 <template>
   <div id="content">
     <h3>Liste des usagers connectés</h3>
-    <div :class="{ hidden: this.userConnection }" style="margin-top: 25px">
+    <div :class="{ hidden: userConnection }" style="margin-top: 25px">
       <p>Veuillez vous connecter pour voir les usagers en ligne!</p>
     </div>
-    <div :class="{ hidden: !this.userConnection }">
+    <div :class="{ hidden: !userConnection }">
       <ul style="list-style: none">
-        <li
-          v-for="(u, index) in this.userList"
-          :key="index"
-          :class="{
-            'conversation-link': true,
-            bold: this.interlocutorId === u.userId,
-          }"
-          @click="this.tryOpenConversation(this.user.userId, u.userId)"
-        >
+        <li v-for="(u, index) in userList" :key="index" :class="{
+          'conversation-link': true,
+          bold: interlocutorId === u.userId,
+        }" @click="tryOpenConversation(user.userId, u.userId ?? '')">
           {{ u.userId }}
         </li>
       </ul>
@@ -30,7 +25,7 @@ import {
   HubEventToken,
   SignalRService,
 } from "@quangdao/vue-signalr";
-import { User, UserData, ConversationData } from "@/models/User";
+import { User, UserData, ConversationData } from "../models/User";
 import { mapMutations, mapState } from "vuex";
 
 let signalr: SignalRService;
@@ -115,10 +110,12 @@ export default defineComponent({
 .hidden {
   display: none;
 }
+
 .conversation-link:hover {
   font-weight: bold;
   cursor: pointer;
 }
+
 .conversation-link {
   display: block;
 }

@@ -9,7 +9,7 @@
     <div class="profil">
       <slot name="userProfile"></slot>
     </div>
-    <div :class="{ personnes: true, scrollable: this.user !== null }">
+    <div :class="{ personnes: true, scrollable: user !== null }">
       <slot name="userList"></slot>
     </div>
   </div>

@@ -1,36 +1,17 @@
 <template>
   <div style="height: 100%">
     <div style="height: 25px; text-align: left; margin: 5px 0px 0px 5px">
-      <img
-        v-if="this.interlocutorId"
-        class="user-image"
-        :src="require('@/assets/person-icon.png')"
-        alt=""
-      />
-      {{ this.interlocutorId }}
+      <img v-if="interlocutorId" class="user-image" src="../assets/person-icon.png" alt="" />
+      {{ interlocutorId }}
     </div>
     <div class="container column-reverse" id="conv-window">
       <div id="div-conv-input">
-        <input
-          id="conv-input"
-          type="text"
-          v-model="textInput"
-          v-on:keyup.enter="sendMessage"
-          :disabled="!this.user || !this.activeConversationId"
-        />
+        <input id="conv-input" type="text" v-model="textInput" v-on:keyup.enter="sendMessage"
+          :disabled="!user || !activeConversationId" />
       </div>
-      <div
-        :class="m.class"
-        class="message"
-        v-for="(m, index) in this.messages"
-        :key="index"
-      >
-        <img
-          class="user-image"
-          v-if="m.class === 'message-received'"
-          :src="m.image ?? require('@/assets/person-icon.png')"
-          alt=""
-        />{{ m.message.content }}
+      <div :class="m.class" class="message" v-for="(m, index) in messages" :key="index">
+        <img class="user-image" v-if="m.class === 'message-received'" :src="m.image ?? '../assets/person-icon.png'"
+          alt="" />{{ m.message.content }}
       </div>
     </div>
   </div>
@@ -45,7 +26,7 @@ import {
 } from "@quangdao/vue-signalr";
 import { defineComponent } from "vue";
 import { mapState } from "vuex";
-import { Message } from "@/models/User";
+import { Message } from "../models/User";
 
 interface ChatMessage {
   userId: string;
@@ -166,22 +147,26 @@ export default defineComponent({
   padding: 6px;
   margin: 5px;
 }
+
 .message-sent {
   background-color: #5c7bdb;
   align-self: flex-end;
   margin-right: 15px;
 }
+
 .message-received {
   background-color: lightgray;
   align-self: flex-start;
   margin-left: 15px;
 }
+
 .user-image {
   display: inline-block;
   width: 20px;
   height: 20px;
   padding-right: 5px;
 }
+
 #div-conv-input {
   width: 100%-20px;
   padding: 5px;
@@ -190,9 +175,11 @@ export default defineComponent({
   margin: 5px;
   height: 50px;
 }
+
 #conv-window {
   height: calc(100% - 30px);
 }
+
 #conv-input {
   margin: auto;
   width: 80%;
