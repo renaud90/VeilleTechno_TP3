@@ -102,6 +102,8 @@ export default defineComponent({
         this.loadUsers();
       } else {
         this.userList = [];
+        this.setActiveConversationId('');
+        this.setInterlocutorId('');
       }
     },
   },
