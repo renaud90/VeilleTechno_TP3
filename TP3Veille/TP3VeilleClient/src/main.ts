@@ -6,7 +6,7 @@ import store from "./store";
 
 createApp(App)
   .use(VueSignalR, {
-    url: "https://localhost:7242/chat" /*'http://localhost:5062'*/,
+    url: "https://tp3veilleserveur.azurewebsites.net/chat" /*'http://localhost:5062'*/,
   })
   .use(store)
   .use(router)
