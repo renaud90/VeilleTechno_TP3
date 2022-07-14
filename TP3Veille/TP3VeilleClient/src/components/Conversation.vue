@@ -1,26 +1,37 @@
 <template>
-  <div class="container column-reverse">
-    <div id="div-conv-input">
-      <input
-        id="conv-input"
-        type="text"
-        v-model="textInput"
-        v-on:keyup.enter="sendMessage"
-        :disabled="!this.user || !this.activeConversationId"
-      />
-    </div>
-    <div
-      :class="m.class"
-      class="message"
-      v-for="(m, index) in this.messages"
-      :key="index"
-    >
+  <div style="height: 100%">
+    <div style="height: 25px; text-align: left; margin: 5px 0px 0px 5px">
       <img
+        v-if="this.interlocutorId"
         class="user-image"
-        v-if="m.class === 'message-received'"
-        :src="m.image ?? require('@/assets/person-icon.png')"
+        :src="require('@/assets/person-icon.png')"
         alt=""
-      />{{ m.message.content }}
+      />
+      {{ this.interlocutorId }}
+    </div>
+    <div class="container column-reverse" id="conv-window">
+      <div id="div-conv-input">
+        <input
+          id="conv-input"
+          type="text"
+          v-model="textInput"
+          v-on:keyup.enter="sendMessage"
+          :disabled="!this.user || !this.activeConversationId"
+        />
+      </div>
+      <div
+        :class="m.class"
+        class="message"
+        v-for="(m, index) in this.messages"
+        :key="index"
+      >
+        <img
+          class="user-image"
+          v-if="m.class === 'message-received'"
+          :src="m.image ?? require('@/assets/person-icon.png')"
+          alt=""
+        />{{ m.message.content }}
+      </div>
     </div>
   </div>
 </template>
@@ -108,7 +119,11 @@ export default defineComponent({
     },
   },
   computed: {
-    ...mapState({ user: "user", activeConversationId: "activeConversationId" }),
+    ...mapState({
+      user: "user",
+      activeConversationId: "activeConversationId",
+      interlocutorId: "interlocutorId",
+    }),
   },
   watch: {
     activeConversationId() {
@@ -117,6 +132,7 @@ export default defineComponent({
         conversationId: this.activeConversationId,
       };
       signalr.invoke(JoinGroup, conversationInfo).then((messages) => {
+        this.messages = [];
         if (messages.value) {
           messages.value.reverse();
 
@@ -173,6 +189,9 @@ export default defineComponent({
   border-radius: 20px;
   margin: 5px;
   height: 50px;
+}
+#conv-window {
+  height: calc(100% - 30px);
 }
 #conv-input {
   margin: auto;

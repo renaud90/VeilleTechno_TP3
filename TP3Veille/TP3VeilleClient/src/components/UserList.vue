@@ -9,7 +9,10 @@
         <li
           v-for="(u, index) in this.userList"
           :key="index"
-          :class="{ 'conversation-link': true }"
+          :class="{
+            'conversation-link': true,
+            bold: this.interlocutorId === u.userId,
+          }"
           @click="this.tryOpenConversation(this.user.userId, u.userId)"
         >
           {{ u.userId }}
@@ -56,7 +59,6 @@ export default defineComponent({
     signalr = useSignalR();
   },
   mounted() {
-    //setInterval(this.loadUsers, 7000);
     signalr.on(OnConnect, () => {
       this.loadUsers();
     });
@@ -66,7 +68,8 @@ export default defineComponent({
   },
   methods: {
     ...mapMutations({
-      openConversation: "openConversation",
+      setActiveConversationId: "setActiveConversationId",
+      setInterlocutorId: "setInterlocutorId",
       setUserCount: "setUserCount",
     }),
     loadUsers() {
@@ -85,24 +88,17 @@ export default defineComponent({
         otherUserId: interlocutorId,
       };
       signalr.invoke(GetConversationId, ids).then((conversationId) => {
-        this.openConversation(conversationId);
+        this.setActiveConversationId(conversationId);
+        this.setInterlocutorId(interlocutorId);
       });
-      /*let conversation: ConversationData | null = this.user.conversationData;
-      if (this.user.conversationData) {
-        conversation = this.user.conversationData.filter(
-          (_: ConversationData) => _.interlocutorId === interlocutorId
-        );
-      }
-
-      if (conversation) {
-        this.openConversation(conversation.conversationId);
-      } else {
-        this.openConversation(this.user.userId + interlocutorId);
-      }*/
     },
   },
   computed: {
-    ...mapState({ user: "user", activeConversationId: "activeConversationId" }),
+    ...mapState({
+      user: "user",
+      activeConversationId: "activeConversationId",
+      interlocutorId: "interlocutorId",
+    }),
   },
   watch: {
     user() {

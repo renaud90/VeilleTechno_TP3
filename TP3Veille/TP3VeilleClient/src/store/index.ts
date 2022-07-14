@@ -3,7 +3,8 @@ import { User, UserData } from "@/models/User";
 
 export type State = {
   user: UserData | null;
-  activeConversationId: string;
+  activeConversationId: string | null;
+  interlocutorId: string | null;
   userCount: number | null;
 };
 
@@ -11,6 +12,7 @@ export default createStore({
   state: {
     user: null,
     activeConversationId: "",
+    interlocutorId: "",
     userCount: null,
   },
   getters: {},
@@ -21,8 +23,11 @@ export default createStore({
     disconnect(state: State) {
       state.user = null;
     },
-    openConversation(state: State, activeConversationId: string) {
+    setActiveConversationId(state: State, activeConversationId: string) {
       state.activeConversationId = activeConversationId;
+    },
+    setInterlocutorId(state: State, interlocutorId: string) {
+      state.interlocutorId = interlocutorId;
     },
     setUserCount(state: State, userCount: number) {
       state.userCount = userCount;

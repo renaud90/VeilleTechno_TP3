@@ -108,4 +108,7 @@ a {
 .scrollable {
   overflow: scroll;
 }
+.bold {
+  font-weight: bold;
+}
 </style>
