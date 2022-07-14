@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using TP3VeilleSignalR.Data.Models;
 using TP3VeilleSignalR.Services;
 using TP3VeilleSignalR.Utilities;

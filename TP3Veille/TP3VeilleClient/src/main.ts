@@ -1,8 +1,8 @@
-import { createApp } from "vue";
-import App from "./App.vue";
+import { createApp } from 'vue'
+import App from './App.vue'
+import { VueSignalR } from "@quangdao/vue-signalr";
 import router from "./router";
 import store from "./store";
-import { VueSignalR } from "@quangdao/vue-signalr";
 
 createApp(App)
   .use(VueSignalR, {

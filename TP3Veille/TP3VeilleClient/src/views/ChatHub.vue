@@ -18,11 +18,11 @@
 </template>
 
 <script lang="ts">
-import ChatHub from "@/components/ChatHub.vue";
-import EnteteComponent from "@/components/Entete.vue";
-import ConversationComponent from "@/components/Conversation.vue";
-import UserProfileComponent from "@/components/UserProfil.vue";
-import UserListComponent from "@/components/UserList.vue";
+import ChatHub from "../components/ChatHub.vue";
+import EnteteComponent from "../components/Entete.vue";
+import ConversationComponent from "../components/Conversation.vue";
+import UserProfileComponent from "../components/UserProfil.vue";
+import UserListComponent from "../components/UserList.vue";
 
 export default {
   name: "ChatHubView",

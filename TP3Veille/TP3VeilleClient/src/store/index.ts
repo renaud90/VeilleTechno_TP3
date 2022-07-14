@@ -1,5 +1,5 @@
 import { createStore } from "vuex";
-import { User, UserData } from "@/models/User";
+import { User, UserData } from "../models/User"
 
 export type State = {
   user: UserData | null;
