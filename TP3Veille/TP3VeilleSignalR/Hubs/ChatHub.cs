@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.SignalR;
 using TP3VeilleSignalR.Data.Models;
 using TP3VeilleSignalR.Services;
 using TP3VeilleSignalR.Utilities;
@@ -75,6 +76,14 @@ public class ChatHub : Hub
         return (await _usersService.GetAllAsync(u => u.ConnectionIds.Count > 0)).ToChatUsers();
     }
 
+    public string GetConversationId(string userId, string otherUserId)
+    {
+        if (string.Compare(userId, otherUserId, StringComparison.Ordinal) <= 0)
+            return $"{userId}:{otherUserId}";
+        else
+            return $"{otherUserId}:{userId}";
+    }
+    
     public async Task<Result<IEnumerable<Message>>> JoinConversation(ConversationInfo info)
     {
         if (!ValidateUser(info.UserId))
