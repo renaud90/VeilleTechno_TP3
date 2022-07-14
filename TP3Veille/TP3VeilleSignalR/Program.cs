@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<ChatDbSettings>(builder.Configuration.GetSection("ChatDbSettings"));
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IConversationsService, ConversationsService>();
 
 builder.Services.AddSignalR();
 
