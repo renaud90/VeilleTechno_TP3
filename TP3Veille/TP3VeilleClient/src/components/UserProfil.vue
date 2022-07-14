@@ -35,13 +35,13 @@ import {
   HubCommandToken,
   SignalRService,
 } from "@quangdao/vue-signalr";
-import User from "@/models/User";
+import { UserData } from "@/models/User";
 import { mapMutations, mapState } from "vuex";
 
 let signalr: SignalRService;
 interface ConnectionResult {
   isSuccess: boolean;
-  value: User;
+  value: UserData;
 }
 interface DisconnectionResult {
   isSuccess: boolean;

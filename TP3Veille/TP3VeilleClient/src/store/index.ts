@@ -1,8 +1,8 @@
 import { createStore } from "vuex";
-import User from "@/models/User";
+import { User, UserData } from "@/models/User";
 
 export type State = {
-  user: User | null;
+  user: UserData | null;
   activeConversationId: string;
   userCount: number | null;
 };
@@ -15,7 +15,7 @@ export default createStore({
   },
   getters: {},
   mutations: {
-    connect(state: State, user: User) {
+    connect(state: State, user: UserData) {
       state.user = user;
     },
     disconnect(state: State) {

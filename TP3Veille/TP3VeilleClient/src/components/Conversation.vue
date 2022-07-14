@@ -20,7 +20,7 @@
         v-if="m.class === 'message-received'"
         :src="m.image ?? require('@/assets/person-icon.png')"
         alt=""
-      />{{ m.message.message }}
+      />{{ m.message.content }}
     </div>
   </div>
 </template>
@@ -34,11 +34,12 @@ import {
 } from "@quangdao/vue-signalr";
 import { defineComponent } from "vue";
 import { mapState } from "vuex";
+import { Message } from "@/models/User";
 
 interface ChatMessage {
   userId: string;
   conversationId: string;
-  message: string;
+  content: string;
   date: Date;
 }
 
@@ -53,8 +54,14 @@ interface ConversationInfo {
   conversationId: string;
 }
 
+interface MessagesResult {
+  isSuccess: boolean;
+  value: Message[];
+}
+
 const SendMessage: HubCommandToken<ChatMessage> = "SendMessage";
-const JoinGroup: HubCommandToken<ConversationInfo> = "JoinConversation";
+const JoinGroup: HubCommandToken<ConversationInfo, MessagesResult> =
+  "JoinConversation";
 const ReceiveMessage: HubEventToken<ChatMessage> = "ReceiveMessage";
 let signalr: SignalRService;
 
@@ -87,7 +94,7 @@ export default defineComponent({
       let chatMessage: ChatMessage = {
         userId: this.user.userId,
         conversationId: this.activeConversationId,
-        message: this.textInput,
+        content: this.textInput,
         date: new Date(),
       };
       signalr.send(SendMessage, chatMessage);
@@ -109,7 +116,29 @@ export default defineComponent({
         userId: this.user.userId,
         conversationId: this.activeConversationId,
       };
-      signalr.invoke(JoinGroup, conversationInfo);
+      signalr.invoke(JoinGroup, conversationInfo).then((messages) => {
+        if (messages.value) {
+          messages.value.reverse();
+
+          messages.value.forEach((m) => {
+            let chatMessage: ChatMessage = {
+              userId: m.userId,
+              conversationId: m.conversationId,
+              content: m.content,
+              date: m.moment,
+            };
+            let messageView: ChatMessageView = {
+              message: chatMessage,
+              class:
+                this.user.userId === m.userId
+                  ? "message-sent"
+                  : "message-received",
+              image: null,
+            };
+            this.messages.push(messageView);
+          });
+        }
+      });
     },
   },
 });
